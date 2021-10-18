@@ -11,11 +11,8 @@ export default class App extends Component {
     currentPage: 1,
     search: '',
     error: null,
+    isLoading: false,
 
-  };
-
-  handleSubmit = newSearch => {
-    this.setState({ search: newSearch, currentPage: 1, images: [] });
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -24,9 +21,15 @@ export default class App extends Component {
     }
   }
 
+  handleSubmit = newSearch => {
+    this.setState({ search: newSearch, currentPage: 1, images: [] });
+  };
+
   fetchPhoto = () => {
     const { search, currentPage } = this.state;
-    
+
+    this.setState({ isLoading: true });
+
     pixabayFetchPhoto(search, currentPage)
       .then(gallery => {
         this.setState(prevState => ({
@@ -35,15 +38,35 @@ export default class App extends Component {
         }));
       })
       .catch(error => this.setState({ error }))
+      .finally(() => {
+        this.onLoadMoreButtonClick();
+        this.setState({ isLoading: false });
+      });
       
-  }
+  };
+
+  onLoadMoreButtonClick = () => {
+    if (this.state.currentPage > 2) {
+      const options = {
+        top: null,
+        behavior: 'smooth',
+      };
+
+      options.top = window.pageYOffset + document.documentElement.clientHeight;
+      setTimeout(() => {
+        window.scrollTo(options);
+      }, 500);
+    }
+  };
 
   render() {
     return (
       <div className="App">
         <Searchbar onSubmit={this.handleSubmit} />
         <ImageGallery images={this.state.images} />
-        <Button onClick={this.fetchPhoto}/>
+        {this.state.search && this.state.images.length > 11 && (
+            <Button onClick={this.fetchPhoto}/>
+        )}
       </div>
     );
   }
