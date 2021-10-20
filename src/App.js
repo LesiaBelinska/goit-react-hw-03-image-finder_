@@ -62,8 +62,9 @@ export default class App extends Component {
   render() {
     return (
       <div className="App">
-       {this.state.error && (<p>No matches found! Try again!</p>)}
+       
         <Searchbar onSubmit={this.handleSubmit} />
+        {this.state.error && (<p>No matches found! Try again!</p>)}
         {this.state.isLoading && (
           <LoaderSpinner/>
         )}
