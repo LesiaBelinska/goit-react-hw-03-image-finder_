@@ -1,9 +1,11 @@
 import './App.css';
-import { Component } from 'react';
+import React, { Component } from 'react';
+
 import pixabayFetchPhoto from './services/pixabay';
 import Searchbar from './components/Searchbar/Searchbar';
 import ImageGallery from './components/ImageGallery/ImageGallery';
 import Button from './components/Button/Button';
+import LoaderSpinner from './components/Loader/Loader';
 
 export default class App extends Component {
   state = {
@@ -11,8 +13,6 @@ export default class App extends Component {
     currentPage: 1,
     search: '',
     error: null,
-    isLoading: false,
-
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -22,7 +22,7 @@ export default class App extends Component {
   }
 
   handleSubmit = newSearch => {
-    this.setState({ search: newSearch, currentPage: 1, images: [] });
+    this.setState({ search: newSearch, currentPage: 1, images: [], error: null });
   };
 
   fetchPhoto = () => {
@@ -62,7 +62,11 @@ export default class App extends Component {
   render() {
     return (
       <div className="App">
+       {this.state.error && (<p>No matches found! Try again!</p>)}
         <Searchbar onSubmit={this.handleSubmit} />
+        {this.state.isLoading && (
+          <LoaderSpinner/>
+        )}
         <ImageGallery images={this.state.images} />
         {this.state.search && this.state.images.length > 11 && (
             <Button onClick={this.fetchPhoto}/>
